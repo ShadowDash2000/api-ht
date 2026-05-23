@@ -57,12 +57,12 @@ docker-compose up --build -d
     ├───repository                        # Работа с БД
     │   ├───department
     │   │   │   repository.go
-    │   │   └───entity
+    │   │   └───record
     │   │           converter.go
     │   │           record.go
     │   └───employee
     │       │   repository.go
-    │       └───entity
+    │       └───record
     │               converter.go
     │               record.go
     └───service                           # Бизнес-логика

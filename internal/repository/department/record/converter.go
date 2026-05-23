@@ -1,4 +1,4 @@
-package entity
+package record
 
 import "rest-api-hitalent/internal/model"
 

@@ -5,7 +5,7 @@ import (
 	"errors"
 	internalerrors "rest-api-hitalent/internal/errors"
 	"rest-api-hitalent/internal/model"
-	"rest-api-hitalent/internal/repository/department/entity"
+	"rest-api-hitalent/internal/repository/department/record"
 
 	"gorm.io/gorm"
 )
@@ -19,18 +19,18 @@ func NewRepository(db *gorm.DB) *repository {
 }
 
 func (r *repository) Create(ctx context.Context, department model.Department) (model.Department, error) {
-	record := entity.ToDepartmentRecord(department)
+	rec := record.ToDepartmentRecord(department)
 
-	err := gorm.G[entity.DepartmentRecord](r.db).Create(ctx, &record)
+	err := gorm.G[record.DepartmentRecord](r.db).Create(ctx, &rec)
 	if err != nil {
 		return model.Department{}, err
 	}
 
-	return entity.ToDepartment(record), nil
+	return record.ToDepartment(rec), nil
 }
 
 func (r *repository) Get(ctx context.Context, id uint) (model.Department, error) {
-	record, err := gorm.G[entity.DepartmentRecord](r.db).
+	rec, err := gorm.G[record.DepartmentRecord](r.db).
 		Where("id = ?", id).
 		First(ctx)
 	if err != nil {
@@ -40,7 +40,7 @@ func (r *repository) Get(ctx context.Context, id uint) (model.Department, error)
 		return model.Department{}, err
 	}
 
-	return entity.ToDepartment(record), nil
+	return record.ToDepartment(rec), nil
 }
 
 // GetAllChildrenWithDepth
@@ -64,7 +64,7 @@ func (r *repository) GetAllChildrenWithDepth(ctx context.Context, id uint, depth
 		SELECT * FROM department_tree
 	`
 
-	records, err := gorm.G[entity.DepartmentRecord](r.db).
+	records, err := gorm.G[record.DepartmentRecord](r.db).
 		Raw(query, id, depth, depth).
 		Find(ctx)
 	if err != nil {
@@ -75,25 +75,25 @@ func (r *repository) GetAllChildrenWithDepth(ctx context.Context, id uint, depth
 		return nil, internalerrors.ErrDepartmentNotFound
 	}
 
-	return entity.ToDepartments(records), nil
+	return record.ToDepartments(records), nil
 }
 
 func (r *repository) Delete(ctx context.Context, ids []uint) error {
-	_, err := gorm.G[entity.DepartmentRecord](r.db).
+	_, err := gorm.G[record.DepartmentRecord](r.db).
 		Where("id IN ?", ids).
 		Delete(ctx)
 	return err
 }
 
 func (r *repository) Update(ctx context.Context, department model.Department) (model.Department, error) {
-	record := entity.ToDepartmentRecord(department)
+	rec := record.ToDepartmentRecord(department)
 
-	_, err := gorm.G[entity.DepartmentRecord](r.db).
-		Where("id = ?", record.Id).
-		Updates(ctx, record)
+	_, err := gorm.G[record.DepartmentRecord](r.db).
+		Where("id = ?", rec.Id).
+		Updates(ctx, rec)
 	if err != nil {
 		return model.Department{}, err
 	}
 
-	return entity.ToDepartment(record), nil
+	return record.ToDepartment(rec), nil
 }
